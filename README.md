@@ -144,10 +144,28 @@ crates/embr-cli --force`. For development you can skip installing and use
 ./macos/build-app.sh
 ```
 
-This builds `EMBR.app` into `/Applications`. It registers `.embr` as a real
-file type (`xyz.embr.archive`) so Finder knows what an archive is, gives it the
-flame icon, and makes **double-clicking a `.embr` extract it** into a folder
-beside it — the way Archive Utility handles a `.zip`.
+This builds `EMBR.app` into `/Applications` and installs a Finder Quick Action.
+Together they give you:
+
+- `.embr` registered as a real file type (`xyz.embr.archive`), so Finder knows
+  what an archive is and shows it with the flame icon
+- **double-clicking a `.embr` extracts it** into a folder beside it, the way
+  Archive Utility handles a `.zip`
+- **right-click → Quick Actions → Compress with EMBR** on any file or folder
+
+The Quick Action mirrors Finder's own Compress: one selected item becomes
+`<name>.embr` beside it, several become `Archive.embr`. It never overwrites —
+a second run produces `name 2.embr`. Install it on its own with:
+
+```sh
+python3 macos/install-quick-action.py
+```
+
+Finder's built-in **Compress** item is not extensible; third parties cannot add
+entries beside it. Quick Actions are the supported route, which is why the
+EMBR entry lives one level down under that submenu rather than next to
+Compress itself. If it does not appear, enable it in **System Settings →
+General → Login Items & Extensions → Finder**.
 
 The app is not a self-extracting executable and never will be. Those fail on a
 recipient's machine under Gatekeeper and notarization, which is precisely when
@@ -245,6 +263,7 @@ crates/embr-format/     the container: writer, reader, index, codecs
 crates/embr-cli/        the `embr` binary
 macos/build-app.sh      builds EMBR.app: file type, icon, double-click
 macos/*.applescript     the droplet that handles double-clicks
+macos/install-quick-action.py   right-click -> Compress with EMBR
 assets/                 logo, and the .iconset macOS needs
   logo-candidates/      the four designs, and the script that draws them
 bench/bench.py          comparison harness
@@ -336,6 +355,8 @@ Ordered by payoff ÷ effort. The measurements above are what rank these.
 - [x] **macOS app.** `.embr` is a registered file type and double-clicking one
       extracts it. See `macos/build-app.sh`.
 - [x] **Finder icon.** `.embr` files show the flame, confirmed on macOS 26.
+- [x] **Right-click to compress.** A Quick Action, since Finder's own Compress
+      menu item cannot be extended by third parties.
 - [ ] **QuickLook extension**, so the space bar previews an archive's contents
       without extracting it. This is the part that would genuinely beat `.zip`
       on feel, not just on size.

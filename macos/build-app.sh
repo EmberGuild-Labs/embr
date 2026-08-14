@@ -158,10 +158,15 @@ else
     echo "    type declaration is trusted"
 fi
 
+# --- Finder Quick Action --------------------------------------------------
+say "installing the Compress with EMBR quick action"
+python3 "$REPO/macos/install-quick-action.py" | sed 's/^/    /'
+
 say "installed $APP"
 echo
 echo "  .embr files should now show the flame icon in Finder."
 echo "  Double-clicking one extracts it into a folder beside it."
+echo "  Right-click any file or folder -> Quick Actions -> Compress with EMBR."
 echo
 echo "  If the icon has not appeared yet, log out and back in — Finder's icon"
 echo "  cache is the slowest part of this and nothing else forces it."
