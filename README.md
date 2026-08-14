@@ -153,8 +153,13 @@ The app is not a self-extracting executable and never will be. Those fail on a
 recipient's machine under Gatekeeper and notarization, which is precisely when
 an archive most needs to work.
 
-You may need to log out and back in before Finder shows the new icon; its icon
-cache is the slowest part of the process and nothing forces it reliably.
+Verified working on macOS 26. If the icon does not appear immediately, Finder's
+icon cache is the usual culprit — the installer flushes it, but a logout will
+force the issue.
+
+A note for anyone debugging this: `NSWorkspace.icon(forFile:)` called from a
+headless script reports the generic document icon even when Finder is drawing
+the real one correctly. It is not a reliable way to check. Look at Finder.
 
 ## Usage
 
@@ -330,10 +335,7 @@ Ordered by payoff ÷ effort. The measurements above are what rank these.
       nobody can open dies.
 - [x] **macOS app.** `.embr` is a registered file type and double-clicking one
       extracts it. See `macos/build-app.sh`.
-- [ ] **Finder icon on macOS 26.** The registration is correct and Launch
-      Services records the icon, but macOS 26 still draws the generic document
-      icon; the app's own icon works from the same `.icns`. Likely needs the new
-      Icon Composer `.icon` format rather than a legacy `.icns`.
+- [x] **Finder icon.** `.embr` files show the flame, confirmed on macOS 26.
 - [ ] **QuickLook extension**, so the space bar previews an archive's contents
       without extracting it. This is the part that would genuinely beat `.zip`
       on feel, not just on size.

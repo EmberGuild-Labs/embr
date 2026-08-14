@@ -9,3 +9,6 @@ bench/results/
 bench/corpora/
 .DS_Store
 assets/embr.icns
+
+# Local test corpus, not part of the project
+TEST/
