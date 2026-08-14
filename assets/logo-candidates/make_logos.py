@@ -138,6 +138,26 @@ DESIGNS = {
     "4-compress": (COMPRESS, "Flame over shrinking bars. Says archive, not just fire."),
 }
 
+# The design that shipped. Change this and re-run to swap the project's logo
+# and the icon macOS shows on .embr files.
+CHOSEN = "2-ember"
+
+# Sizes macOS wants in an .iconset. Every one is an exact whole-number multiple
+# of the 16x16 grid, so each is pixel-perfect with no resampling anywhere —
+# which is the entire reason to draw a logo on a 16px grid in the first place.
+ICONSET = [
+    ("icon_16x16.png", 1),
+    ("icon_16x16@2x.png", 2),
+    ("icon_32x32.png", 2),
+    ("icon_32x32@2x.png", 4),
+    ("icon_128x128.png", 8),
+    ("icon_128x128@2x.png", 16),
+    ("icon_256x256.png", 16),
+    ("icon_256x256@2x.png", 32),
+    ("icon_512x512.png", 32),
+    ("icon_512x512@2x.png", 64),
+]
+
 
 def check(grid: list[str], name: str) -> None:
     """Pixel art is unforgiving about alignment, so verify the grid is square
@@ -244,15 +264,33 @@ def write_sheet(path: Path, scale: int = 14, gap: int = 3) -> None:
     path.write_bytes(png)
 
 
+def write_chosen(grid: list[str]) -> None:
+    """Write the shipping logo one level up, plus the .iconset macOS needs."""
+    assets = OUT.parent
+    write_svg(assets / "logo.svg", grid)
+    write_png(assets / "logo.png", grid, 32)        # 512px
+    write_png(assets / "logo-1024.png", grid, 64)   # for README / stores
+    write_png(assets / "logo-32.png", grid, 2)      # favicon
+
+    iconset = assets / "embr.iconset"
+    iconset.mkdir(exist_ok=True)
+    for filename, scale in ICONSET:
+        write_png(iconset / filename, grid, scale)
+    print(f"\nchose {CHOSEN} -> assets/logo.svg, logo.png, embr.iconset/")
+    print("run macos/build-app.sh to turn the iconset into the Finder icon")
+
+
 def main() -> None:
     for name, (grid, desc) in DESIGNS.items():
         check(grid, name)
         write_png(OUT / f"{name}.png", grid, SCALE)
         write_png(OUT / f"{name}-32.png", grid, 2)   # favicon-scale preview
         write_svg(OUT / f"{name}.svg", grid)
-        print(f"{name:<12} {desc}")
+        marker = "  <-- chosen" if name == CHOSEN else ""
+        print(f"{name:<12} {desc}{marker}")
     write_sheet(OUT / "contact-sheet.png")
     print("\ncontact-sheet.png — all four side by side")
+    write_chosen(DESIGNS[CHOSEN][0])
 
 
 if __name__ == "__main__":

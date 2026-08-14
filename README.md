@@ -1,3 +1,5 @@
+<img src="assets/logo.png" alt="EMBR" width="128" align="right">
+
 # EMBR
 
 A more effective `.zip`.
@@ -104,19 +106,55 @@ goal and it is not built yet. See [Roadmap](#roadmap).
 
 ## Install
 
-Requires [Rust](https://rustup.rs).
+Requires [Rust](https://rustup.rs). If you do not have it:
 
 ```sh
-git clone <this repo> && cd EMBR
-cargo build --release
-./target/release/embr --help
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 
-Optionally put it on your PATH:
+Then build and install `embr` so it runs from anywhere:
 
 ```sh
+git clone https://github.com/EmberGuild-Labs/embr.git
+cd embr
 cargo install --path crates/embr-cli
 ```
+
+That puts the binary in `~/.cargo/bin`. If `embr` is not found afterwards, that
+directory is not on your `PATH` — add it once:
+
+```sh
+echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> ~/.zshrc   # or ~/.bashrc
+exec $SHELL
+```
+
+Check it worked:
+
+```sh
+embr --version     # embr 0.1.0
+```
+
+To rebuild after changing the source, re-run `cargo install --path
+crates/embr-cli --force`. For development you can skip installing and use
+`cargo build --release && ./target/release/embr` directly.
+
+### macOS: Finder integration
+
+```sh
+./macos/build-app.sh
+```
+
+This builds `EMBR.app` into `/Applications`. It registers `.embr` as a real
+file type (`xyz.embr.archive`) so Finder knows what an archive is, gives it the
+flame icon, and makes **double-clicking a `.embr` extract it** into a folder
+beside it — the way Archive Utility handles a `.zip`.
+
+The app is not a self-extracting executable and never will be. Those fail on a
+recipient's machine under Gatekeeper and notarization, which is precisely when
+an archive most needs to work.
+
+You may need to log out and back in before Finder shows the new icon; its icon
+cache is the slowest part of the process and nothing forces it reliably.
 
 ## Usage
 
@@ -200,9 +238,28 @@ crates/embr-format/     the container: writer, reader, index, codecs
   src/classify.rs       lane assignment and sort order
   src/codec.rs          zstd / xz / store
 crates/embr-cli/        the `embr` binary
+macos/build-app.sh      builds EMBR.app: file type, icon, double-click
+macos/*.applescript     the droplet that handles double-clicks
+assets/                 logo, and the .iconset macOS needs
+  logo-candidates/      the four designs, and the script that draws them
 bench/bench.py          comparison harness
 docs/FORMAT.md          format specification
 ```
+
+### Logo
+
+The mark is pixel art drawn on a 16x16 grid — the same grid a favicon and a
+Finder icon use, so every exported size is a whole-number multiple with no
+resampling anywhere. It is defined as plain text in
+`assets/logo-candidates/make_logos.py`; edit a row, re-run the script, and
+every PNG, SVG and icon size regenerates.
+
+```sh
+python3 assets/logo-candidates/make_logos.py
+```
+
+Four candidates were drawn and the "ember" design chosen. Change `CHOSEN` in
+that file to swap it.
 
 ## How it works
 
@@ -271,11 +328,15 @@ Ordered by payoff ÷ effort. The measurements above are what rank these.
       open it. Same Rust code via `wasm-pack`, a static page that extracts
       locally in the browser. Treated as required, not optional — a format
       nobody can open dies.
-- [ ] **macOS app.** Register a UTI so double-clicking a `.embr` extracts it,
-      with a custom Finder icon and a QuickLook extension so the space bar
-      previews an archive's contents without extracting. Explicitly **not** a
-      self-extracting executable: Gatekeeper and notarization make those fail on
-      a recipient's machine.
+- [x] **macOS app.** `.embr` is a registered file type and double-clicking one
+      extracts it. See `macos/build-app.sh`.
+- [ ] **Finder icon on macOS 26.** The registration is correct and Launch
+      Services records the icon, but macOS 26 still draws the generic document
+      icon; the app's own icon works from the same `.icns`. Likely needs the new
+      Icon Composer `.icon` format rather than a legacy `.icns`.
+- [ ] **QuickLook extension**, so the space bar previews an archive's contents
+      without extracting it. This is the part that would genuinely beat `.zip`
+      on feel, not just on size.
 - [ ] **Parallel block compression.** Blocks are already independent.
 
 **Then**
