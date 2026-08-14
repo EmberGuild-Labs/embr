@@ -12,7 +12,7 @@ decompressing everything before it.
 It does this without inventing a compression algorithm. Every win comes from the
 container.
 
-**[embr.proxnode.xyz](https://embr.proxnode.xyz)** · [Format spec](docs/FORMAT.md) · [Benchmarks](bench/bench.py)
+**[embr.proxnode.xyz](https://embr.blaise.wtf)** · [Format spec](docs/FORMAT.md) · [Benchmarks](bench/bench.py)
 
 ## Why ZIP loses
 
