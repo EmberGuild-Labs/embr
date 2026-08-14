@@ -12,6 +12,8 @@ decompressing everything before it.
 It does this without inventing a compression algorithm. Every win comes from the
 container.
 
+**[embr.proxnode.xyz](https://embr.proxnode.xyz)** · [Format spec](docs/FORMAT.md) · [Benchmarks](bench/bench.py)
+
 ## Why ZIP loses
 
 ZIP was designed in 1989 and its limits are structural, not fixable by turning
