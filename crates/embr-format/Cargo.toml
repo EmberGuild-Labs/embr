@@ -1,0 +1,17 @@
+[package]
+name = "embr-format"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Core container format, writer and reader for EMBR archives"
+
+[dependencies]
+anyhow.workspace = true
+blake3.workspace = true
+serde.workspace = true
+bincode.workspace = true
+zstd.workspace = true
+xz2.workspace = true
+walkdir.workspace = true
+filetime.workspace = true
+num_cpus.workspace = true

@@ -1,0 +1,10 @@
+/target
+**/*.rs.bk
+*.embr
+*.zip
+*.7z
+*.tar.zst
+*.tar.xz
+bench/results/
+bench/corpora/
+.DS_Store

@@ -1,0 +1,15 @@
+[package]
+name = "embr-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Command-line interface for EMBR archives"
+
+[[bin]]
+name = "embr"
+path = "src/main.rs"
+
+[dependencies]
+embr-format = { path = "../embr-format" }
+anyhow.workspace = true
+clap.workspace = true
