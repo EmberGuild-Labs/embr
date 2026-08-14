@@ -100,6 +100,25 @@ EMBR recovers ~0.9% from a camera roll (shared EXIF blocks and embedded
 thumbnails, visible only because the photos share a solid block) and otherwise
 declines to waste your time.
 
+**Installers and archives are the same story.** A `.pkg`, `.dmg`, `.zip` or
+`.whl` has already had its contents compressed, and re-compressing the result
+recovers 1–2% at best:
+
+| Corpus | Input | EMBR | Saved |
+|---|---|---|---|
+| 6 `.dmg` installers | 130.2 MB | 128.3 MB | 1.5% |
+| zips, jars and wheels | 31.3 MB | 25.6 MB | 18.3% |
+| Two `.pkg` builds of the same app, one file apart | 78.5 MB | 77.7 MB | 1.1% |
+
+That last row is the one worth understanding. The two packages differ by a
+single line of text, yet almost nothing can be saved — because `pkgbuild`
+gzipped the payload first, and compression destroys the similarity that
+deduplication would otherwise have found. The *same content before packaging*
+compresses 7.6×, with dedup removing 118 MB of it.
+
+The lesson generalises: **compress last.** Once something has been through a
+compressor, its redundancy is gone for good, and no archiver gets it back.
+
 Closing that gap needs *format-aware, lossless recompression* — transcoding a
 JPEG into a smaller bit-exact representation. That is the project's flagship
 goal and it is not built yet. See [Roadmap](#roadmap).
@@ -384,8 +403,8 @@ Ordered by payoff ÷ effort. The measurements above are what rank these.
 - **No incremental update.** Adding a file rewrites the archive.
 - **xz is single-threaded here**, so `--preset max` is roughly 10× slower than
   `balanced` for about 12% more compression.
-- **The lane heuristic is extension-based.** A `.zip` full of stored entries
-  lands in the fast lane and compresses worse than it could.
+- **The lane heuristic is extension-based**, so it can be fooled by a file whose
+  name does not match its contents. `--fast-lane false` opts out.
 - **v1 is unstable.** The format may change without a compatibility path until
   it is declared frozen.
 
